@@ -135,11 +135,13 @@ def a_part():
     first_interval = True
     for interval in intervals:
         if first_interval:
-            plt.plot((interval[0], interval[1]), (0.9, 0.9), label='intervals', linewidth=5, marker='', color='b')
+            plt.plot((interval[0], interval[1]), (0.9, 0.9), label='Intervals', linewidth=5, marker='', color='b')
             first_interval = False
         else:
             plt.plot((interval[0], interval[1]), (0.9, 0.9), linewidth=5, marker='', color='b')
     plt.legend()
+    plt.yticks(arange(-0.1, 1.1, 1.2))
+    plt.xticks(arange(0, 1.01, 0.1))
     plt.show()
 
 def c_part():
@@ -160,11 +162,11 @@ def c_part():
             temp_emprical.append(float(besterror)/m)
         true_errors.append(sum(temp_true)/100)
         emprical_errors.append(sum(temp_emprical)/100)
-    plt.plot(ms,true_errors, '.r-', label='true error')
-    plt.plot(ms,emprical_errors, '.b-', label='emprical error')
-    plt.xlabel('samples size', fontsize=18)
-    plt.xticks(arange(10, 100, 10))
-    plt.ylabel('error', fontsize=16)
+    plt.plot(ms,true_errors, '.r-', label='True error')
+    plt.plot(ms,emprical_errors, '.b-', label='Emprical error')
+    plt.xticks(arange(10, 101, 10))
+    plt.xlabel('Training set size', fontsize=18)
+    plt.ylabel('Error', fontsize=16)
     plt.legend()
     plt.show()
 
@@ -183,11 +185,11 @@ def d_part():
         true_errors.append(true_error(intervals))
         emprical_errors.append(float(besterror) / m)
 
-    plt.plot(ks, true_errors, '.r-', label='true error')
-    plt.plot(ks, emprical_errors, '.b-', label='emprical error')
+    plt.plot(ks, true_errors, '.r-', label='True error')
+    plt.plot(ks, emprical_errors, '.b-', label='Emprical error')
     plt.legend()
-    plt.xlabel('k size', fontsize=18)
-    plt.ylabel('error', fontsize=16)
+    plt.xlabel('k', fontsize=18)
+    plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20, 1))
     plt.show()
 
@@ -215,11 +217,11 @@ def e_part():
             best_fitting = score
             best_k = hypothesis[0]
 
-    plt.plot(ks, old_scores, '.r-', label='with original samples')
-    plt.plot(ks, new_samples_scores, '.b-', label='with new samples')
+    plt.plot(ks, old_scores, '.r-', label='Training set')
+    plt.plot(ks, new_samples_scores, '.b-', label='Holdout set')
     plt.legend()
-    plt.xlabel('k size', fontsize=18)
-    plt.ylabel('error', fontsize=16)
+    plt.xlabel('K', fontsize=18)
+    plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20, 1))
     plt.show()
     print best_k
