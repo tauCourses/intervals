@@ -52,7 +52,7 @@ def find_best_interval(xs, ys, k):
 
     return intervals, besterror
 
-def create_sample(m):
+def create_training_set(m):
     samples = []
     for i in range(m):
         x = random.uniform(0,1)
@@ -61,6 +61,7 @@ def create_sample(m):
         else:
             y = random.binomial(1, 0.1)
         samples.append((x,y))
+    samples.sort(key=lambda x:x[0])
     return samples
 
 def emprical_error(samples, intervals):
@@ -123,13 +124,12 @@ def true_error(intervals):
 
 def a_part():
     lines = [0.25,0.5,0.75]
-    samples = create_sample(100)
-    k=2
-    samples.sort(key=lambda x:x[0])
-    xs = [x[0] for x in samples]
-    ys = [y[1] for y in samples]
+    k = 2
+    training_set = create_training_set(100)
+    xs = [x[0] for x in training_set]
+    ys = [y[1] for y in training_set]
     intervals, besterror = find_best_interval(xs,ys,k)
-    plt.scatter(*zip(*samples), s=2)
+    plt.scatter(*zip(*training_set), s=2)
     for line in lines:
         plt.plot((line, line), (0, 1), linewidth=1, marker='', color='r')
     first_interval = True
@@ -142,88 +142,89 @@ def a_part():
     plt.legend()
     plt.yticks(arange(-0.1, 1.1, 1.2))
     plt.xticks(arange(0, 1.01, 0.1))
-    plt.show()
+    plt.savefig("a.png")
+    plt.clf()
 
 def c_part():
     k=2
     ms = [10 + 5*i for i in range(19)]
     true_errors = []
-    emprical_errors = []
+    empirical_errors = []
     for m in ms:
         temp_true = []
-        temp_emprical = []
+        temp_empirical = []
         for i in range(100):
-            samples = create_sample(m)
-            samples.sort(key=lambda x: x[0])
-            xs = [x[0] for x in samples]
-            ys = [y[1] for y in samples]
+            training_set = create_training_set(m)
+            xs = [x[0] for x in training_set]
+            ys = [y[1] for y in training_set]
             intervals, besterror = find_best_interval(xs, ys, k)
             temp_true.append(true_error(intervals))
-            temp_emprical.append(float(besterror)/m)
+            temp_empirical.append(float(besterror)/m)
         true_errors.append(sum(temp_true)/100)
-        emprical_errors.append(sum(temp_emprical)/100)
+        empirical_errors.append(sum(temp_empirical)/100)
     plt.plot(ms,true_errors, '.r-', label='True error')
-    plt.plot(ms,emprical_errors, '.b-', label='Emprical error')
+    plt.plot(ms,empirical_errors, '.b-', label='Empirical error')
     plt.xticks(arange(10, 101, 10))
     plt.xlabel('Training set size', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.legend()
-    plt.show()
+    plt.savefig("c.png")
+    plt.clf()
 
 def d_part():
     m=50
-    samples = create_sample(m)
-    samples.sort(key=lambda x: x[0])
-    xs = [x[0] for x in samples]
-    ys = [y[1] for y in samples]
+    training_set = create_training_set(m)
+    xs = [x[0] for x in training_set]
+    ys = [y[1] for y in training_set]
 
     ks = [i for i in range(1,21)]
     true_errors = []
-    emprical_errors = []
+    empirical_errors = []
     for k in ks:
         intervals, besterror = find_best_interval(xs, ys, k)
         true_errors.append(true_error(intervals))
-        emprical_errors.append(float(besterror) / m)
+        empirical_errors.append(float(besterror) / m)
 
     plt.plot(ks, true_errors, '.r-', label='True error')
-    plt.plot(ks, emprical_errors, '.b-', label='Emprical error')
+    plt.plot(ks, empirical_errors, '.b-', label='Empirical error')
     plt.legend()
     plt.xlabel('k', fontsize=18)
     plt.ylabel('Error', fontsize=16)
-    plt.xticks(arange(1, 20, 1))
-    plt.show()
+    plt.xticks(arange(1, 20.5, 1))
+    plt.savefig("d.png")
+    plt.clf()
 
 def e_part():
     m = 50
     ks = [i for i in range(1, 21)]
-    samples = create_sample(m)
-    samples.sort(key=lambda x: x[0])
-    xs = [x[0] for x in samples]
-    ys = [y[1] for y in samples]
+    training_set = create_training_set(m)
+    xs = [x[0] for x in training_set]
+    ys = [y[1] for y in training_set]
     hypothesises = []
-    old_scores = []
+    training_scores = []
     for k in ks:
         intervals, besterror = find_best_interval(xs, ys, k)
         hypothesises.append([k,intervals])
-        old_scores.append(float(besterror)/m)
-    new_samples = create_sample(m)
-    best_fitting = emprical_error(new_samples,hypothesises[0][1])
+        training_scores.append(float(besterror)/m)
+    holdout_set = create_training_set(m)
+    best_fitting = emprical_error(holdout_set,hypothesises[0][1])
     best_k = hypothesises[0][0]
-    new_samples_scores = [best_fitting]
+    holdout_scores = [best_fitting]
     for hypothesis in hypothesises[1:]:
-        score = emprical_error(new_samples,hypothesis[1])
-        new_samples_scores.append(score)
+        score = emprical_error(holdout_set,hypothesis[1])
+        holdout_scores.append(score)
         if score < best_fitting:
             best_fitting = score
             best_k = hypothesis[0]
 
-    plt.plot(ks, old_scores, '.r-', label='Training set')
-    plt.plot(ks, new_samples_scores, '.b-', label='Holdout set')
+    plt.plot(ks, training_scores, '.r-', label='Training set')
+    plt.plot(ks, holdout_scores, '.b-', label='Holdout set')
     plt.legend()
     plt.xlabel('K', fontsize=18)
     plt.ylabel('Error', fontsize=16)
-    plt.xticks(arange(1, 20, 1))
-    plt.show()
+    plt.xticks(arange(1, 20.5, 1))
+    plt.savefig("e.png")
+    plt.clf()
     print best_k
 
 a_part()
