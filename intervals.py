@@ -1,5 +1,6 @@
 from numpy import *
 import matplotlib.pyplot as plt
+import sys
 
 def find_best_interval(xs, ys, k):
     assert all(array(xs) == array(sorted(xs))), "xs must be sorted!"
@@ -227,7 +228,20 @@ def e_part():
     plt.clf()
     print best_k
 
-a_part()
-c_part()
-d_part()
-e_part()
+if len(sys.argv) < 2:
+    print "please enter which part do you want to execute - a,c,d,e or all"
+    exit()
+cmds = sys.argv[1:]
+for cmd in cmds:
+    if cmd not in ['a','c','d','e','all']:
+        print "unkown argument %s. please run with a, c, d, e or all" % cmd
+        exit()
+
+if 'a' in cmds or 'all' in cmds:
+    a_part()
+if 'c' in cmds or 'all' in cmds:
+    c_part()
+if 'd' in cmds or 'all' in cmds:
+    d_part()
+if 'e' in cmds or 'all' in cmds:
+    e_part()

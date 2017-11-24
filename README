@@ -1,0 +1,20 @@
+Machine learning - Assignment 2
+
+by:
+Matan Harel - 302695721
+    Email - matan.harel.mh@gmail.com
+Ido Kessler - 311398499
+    Email - kessido@gmail.com
+
+Please run interval.py with python2.
+Please add the parts you want to execute as command line arguments - a, c, d, e (no code for b part)
+
+You can send few arguments in one run - a, e, d
+You can send 'all' argument to run all of them
+
+The outputs are 4 plots that saved in png format in the same directory.
+
+Part c is the longest one and it takes about 1-2 minutes
+
+Enjoy your day,
+Ido & Matan :)
