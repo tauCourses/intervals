@@ -1,4 +1,6 @@
 from numpy import *
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import sys
 
@@ -54,26 +56,28 @@ def find_best_interval(xs, ys, k):
     return intervals, besterror
 
 def create_training_set(m):
-    samples = []
+    training_set = []
     for i in range(m):
         x = random.uniform(0,1)
         if 0<=x<=0.25 or 0.5<=x<0.75:
             y = random.binomial(1,0.8)
         else:
             y = random.binomial(1, 0.1)
-        samples.append((x,y))
-    samples.sort(key=lambda x:x[0])
-    return samples
+        training_set.append((x,y))
+    training_set.sort(key=lambda x:x[0])
+    xs = [x[0] for x in training_set]
+    ys = [y[1] for y in training_set]
+    return xs, ys
 
-def emprical_error(samples, intervals):
+def emprical_error(xs, ys, intervals):
     errors = 0
-    for sample in samples:
-        if len([True for interval in intervals if interval[0] <= sample[0] <= interval[1]]) > 0:
-            if sample[1] == 0:
+    for i in range(len(xs)):
+        if len([True for interval in intervals if interval[0] <= xs[i] <= interval[1]]) > 0:
+            if ys[i] == 0:
                 errors += 1
-        elif sample[1] == 1:
+        elif ys[i] == 1:
             errors += 1
-    return float(errors) / len(samples)
+    return float(errors) / len(xs)
 
 
 def true_error(intervals):
@@ -126,25 +130,26 @@ def true_error(intervals):
 def a_part():
     lines = [0.25,0.5,0.75]
     k = 2
-    training_set = create_training_set(100)
-    xs = [x[0] for x in training_set]
-    ys = [y[1] for y in training_set]
+    xs, ys = create_training_set(100)
     intervals, besterror = find_best_interval(xs,ys,k)
-    plt.scatter(*zip(*training_set), s=2)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(xs,ys, s=2)
     for line in lines:
-        plt.plot((line, line), (0, 1), linewidth=1, marker='', color='r')
+        ax.plot((line, line), (0, 1), linewidth=1, marker='', color='r')
     first_interval = True
     for interval in intervals:
         if first_interval:
-            plt.plot((interval[0], interval[1]), (0.9, 0.9), label='Intervals', linewidth=5, marker='', color='b')
+            ax.plot((interval[0], interval[1]), (0.9, 0.9), label='Intervals', linewidth=5, marker='', color='b')
             first_interval = False
         else:
-            plt.plot((interval[0], interval[1]), (0.9, 0.9), linewidth=5, marker='', color='b')
-    plt.legend()
+            ax.plot((interval[0], interval[1]), (0.9, 0.9), linewidth=5, marker='', color='b')
+
+    ax.legend()
     plt.yticks(arange(-0.1, 1.1, 1.2))
     plt.xticks(arange(0, 1.01, 0.1))
-    plt.savefig("a.png")
-    plt.clf()
+    fig.savefig("a.png")
+    fig.clf()
 
 def c_part():
     k=2
@@ -155,9 +160,7 @@ def c_part():
         temp_true = []
         temp_empirical = []
         for i in range(100):
-            training_set = create_training_set(m)
-            xs = [x[0] for x in training_set]
-            ys = [y[1] for y in training_set]
+            xs, ys = create_training_set(m)
             intervals, besterror = find_best_interval(xs, ys, k)
             temp_true.append(true_error(intervals))
             temp_empirical.append(float(besterror)/m)
@@ -174,9 +177,7 @@ def c_part():
 
 def d_part():
     m=50
-    training_set = create_training_set(m)
-    xs = [x[0] for x in training_set]
-    ys = [y[1] for y in training_set]
+    xs, ys = create_training_set(m)
 
     ks = [i for i in range(1,21)]
     true_errors = []
@@ -198,21 +199,19 @@ def d_part():
 def e_part():
     m = 50
     ks = [i for i in range(1, 21)]
-    training_set = create_training_set(m)
-    xs = [x[0] for x in training_set]
-    ys = [y[1] for y in training_set]
+    xs, ys = create_training_set(m)
     hypothesises = []
     training_scores = []
     for k in ks:
         intervals, besterror = find_best_interval(xs, ys, k)
         hypothesises.append([k,intervals])
         training_scores.append(float(besterror)/m)
-    holdout_set = create_training_set(m)
-    best_fitting = emprical_error(holdout_set,hypothesises[0][1])
+    xs, ys = create_training_set(m)
+    best_fitting = emprical_error(xs, ys,hypothesises[0][1])
     best_k = hypothesises[0][0]
     holdout_scores = [best_fitting]
     for hypothesis in hypothesises[1:]:
-        score = emprical_error(holdout_set,hypothesis[1])
+        score = emprical_error(xs, ys,hypothesis[1])
         holdout_scores.append(score)
         if score < best_fitting:
             best_fitting = score
