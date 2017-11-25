@@ -3,6 +3,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import sys
+import os
 
 def find_best_interval(xs, ys, k):
     assert all(array(xs) == array(sorted(xs))), "xs must be sorted!"
@@ -129,7 +130,7 @@ def true_error(intervals):
 
     return loss
 
-def a_part():
+def a_part(dir_path):
     lines = [0.25,0.5,0.75]
     k = 2
     xs, ys = create_training_set(100)
@@ -150,10 +151,10 @@ def a_part():
     ax.legend()
     plt.yticks(arange(-0.1, 1.1, 1.2))
     plt.xticks(arange(0, 1.01, 0.1))
-    fig.savefig("a.png")
+    fig.savefig(os.path.join(dir_path, 'a.png'))
     fig.clf()
 
-def c_part():
+def c_part(dir_path):
     k=2
     ms = [10 + 5*i for i in range(19)]
     true_errors = []
@@ -176,10 +177,10 @@ def c_part():
     plt.xlabel('Training set size', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.legend()
-    fig.savefig("c.png")
+    fig.savefig(os.path.join(dir_path, 'c.png'))
     fig.clf()
 
-def d_part():
+def d_part(dir_path):
     m=50
     xs, ys = create_training_set(m)
 
@@ -198,10 +199,10 @@ def d_part():
     plt.xlabel('k', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20.5, 1))
-    fig.savefig("d.png")
+    fig.savefig(os.path.join(dir_path, 'd.png'))
     fig.clf()
 
-def e_part():
+def e_part(dir_path):
     m = 50
     ks = [i for i in range(1, 21)]
     xs, ys = create_training_set(m)
@@ -229,9 +230,11 @@ def e_part():
     plt.xlabel('k', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20.5, 1))
-    fig.savefig("e.png")
+    fig.savefig(os.path.join(dir_path,'e.png'))
     fig.clf()
     print "Holdout validation test found that the smallest error is when k=%d"%best_k
+
+dir_path = repr(os.path.dirname(os.path.realpath(sys.argv[0]))).strip("'")
 
 if len(sys.argv) < 2:
     print "Please enter which part do you want to execute - a,c,d,e or all"
@@ -243,10 +246,10 @@ for cmd in cmds:
         exit()
 
 if 'a' in cmds or 'all' in cmds:
-    a_part()
+    a_part(dir_path)
 if 'c' in cmds or 'all' in cmds:
-    c_part()
+    c_part(dir_path)
 if 'd' in cmds or 'all' in cmds:
-    d_part()
+    d_part(dir_path)
 if 'e' in cmds or 'all' in cmds:
-    e_part()
+    e_part(dir_path)
