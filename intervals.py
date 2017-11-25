@@ -166,14 +166,16 @@ def c_part():
             temp_empirical.append(float(besterror)/m)
         true_errors.append(sum(temp_true)/100)
         empirical_errors.append(sum(temp_empirical)/100)
-    plt.plot(ms,true_errors, '.r-', label='True error')
-    plt.plot(ms,empirical_errors, '.b-', label='Empirical error')
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(ms,true_errors, '.r-', label='True error')
+    ax.plot(ms,empirical_errors, '.b-', label='Empirical error')
     plt.xticks(arange(10, 101, 10))
     plt.xlabel('Training set size', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.legend()
-    plt.savefig("c.png")
-    plt.clf()
+    fig.savefig("c.png")
+    fig.clf()
 
 def d_part():
     m=50
@@ -186,15 +188,16 @@ def d_part():
         intervals, besterror = find_best_interval(xs, ys, k)
         true_errors.append(true_error(intervals))
         empirical_errors.append(float(besterror) / m)
-
-    plt.plot(ks, true_errors, '.r-', label='True error')
-    plt.plot(ks, empirical_errors, '.b-', label='Empirical error')
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(ks, true_errors, '.r-', label='True error')
+    ax.plot(ks, empirical_errors, '.b-', label='Empirical error')
     plt.legend()
     plt.xlabel('k', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20.5, 1))
-    plt.savefig("d.png")
-    plt.clf()
+    fig.savefig("d.png")
+    fig.clf()
 
 def e_part():
     m = 50
@@ -216,15 +219,16 @@ def e_part():
         if score < best_fitting:
             best_fitting = score
             best_k = hypothesis[0]
-
-    plt.plot(ks, training_scores, '.r-', label='Training set')
-    plt.plot(ks, holdout_scores, '.b-', label='Holdout set')
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(ks, training_scores, '.r-', label='Training set')
+    ax.plot(ks, holdout_scores, '.b-', label='Holdout set')
     plt.legend()
-    plt.xlabel('K', fontsize=18)
+    plt.xlabel('k', fontsize=18)
     plt.ylabel('Error', fontsize=16)
     plt.xticks(arange(1, 20.5, 1))
-    plt.savefig("e.png")
-    plt.clf()
+    fig.savefig("e.png")
+    fig.clf()
     print best_k
 
 if len(sys.argv) < 2:
