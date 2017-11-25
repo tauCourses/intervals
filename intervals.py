@@ -100,6 +100,8 @@ def true_error(intervals):
             space_partition.append([[current_point,interval[0]], 0])
             space_partition.append([[interval[0],interval[1]], 1])
             current_point = interval[1]
+    if space_partition[-1][0][1] < 1:
+        space_partition.append([[space_partition[-1][0][1], 1], 0])
     loss = 0
     for interval in space_partition:
         if interval[0][1] <= 0.25:
