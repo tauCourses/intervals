@@ -229,15 +229,15 @@ def e_part():
     plt.xticks(arange(1, 20.5, 1))
     fig.savefig("e.png")
     fig.clf()
-    print best_k
+    print "Holdout validation test found that the smallest error is when k=%d"%best_k
 
 if len(sys.argv) < 2:
-    print "please enter which part do you want to execute - a,c,d,e or all"
+    print "Please enter which part do you want to execute - a,c,d,e or all"
     exit()
 cmds = sys.argv[1:]
 for cmd in cmds:
     if cmd not in ['a','c','d','e','all']:
-        print "unkown argument %s. please run with a, c, d, e or all" % cmd
+        print "Unknown argument %s. please run with a, c, d, e or all" % cmd
         exit()
 
 if 'a' in cmds or 'all' in cmds:
