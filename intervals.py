@@ -5,6 +5,13 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
+dir_path = repr(os.path.dirname(os.path.realpath(sys.argv[0]))).strip("'")
+
+distribution = [((0, 0.25), 0.8),
+                ((0.25, 0.5), 0.1),
+                ((0.5, 0.75), 0.8),
+                ((0.75, 1), 0.1)]
+
 
 def find_best_interval(xs, ys, k):
     assert all(array(xs) == array(sorted(xs))), "xs must be sorted!"
@@ -58,7 +65,7 @@ def find_best_interval(xs, ys, k):
     return intervals, besterror
 
 
-def create_training_set(m, distribution):
+def create_training_set(m):
     training_set = []
     for i in range(m):
         x = random.uniform(0, 1)
@@ -67,7 +74,7 @@ def create_training_set(m, distribution):
                 y = random.binomial(1, interval[1])
                 break
         else:
-            assert False, "x not in [0,1]"
+            assert False, "%f not in [0,1]" % x
         training_set.append((x, y))
     training_set.sort(key=lambda x: x[0])
     xs = [x[0] for x in training_set]
@@ -86,7 +93,7 @@ def empirical_error(xs, ys, intervals):
     return float(errors) / len(xs)
 
 
-def true_error(intervals, distribution):
+def true_error(intervals):
     intervals.sort(key=lambda x: x[0])
     current_point = 0
     space_partition = []
@@ -102,16 +109,16 @@ def true_error(intervals, distribution):
         space_partition.append(((space_partition[-1][0][1], 1), 0))
     loss = 0
     for interval in space_partition:
-        loss += interval_true_error(interval[0], interval[1], distribution)
+        loss += interval_true_error(interval[0], interval[1])
 
     return loss
 
 
-def interval_true_error(interval, type, distribution):
+def interval_true_error(interval, interval_type):
     loss = 0
     start, end = interval
     for part in distribution:
-        interval_loss = part[1] if type == 0 else 1 - part[1]
+        interval_loss = part[1] if interval_type == 0 else 1 - part[1]
         if end <= part[0][1]:
             loss += (end - start) * interval_loss
             return loss
@@ -121,16 +128,16 @@ def interval_true_error(interval, type, distribution):
     return loss
 
 
-def a_part(dir_path, distribution):
-    lines = [0.25, 0.5, 0.75]
+def a_part():
     k = 2
-    xs, ys = create_training_set(100, distribution)
+    m = 100
+    xs, ys = create_training_set(m)
     intervals, besterror = find_best_interval(xs, ys, k)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.scatter(xs, ys, s=2)
-    for line in lines:
-        ax.plot((line, line), (0, 1), linewidth=1, marker='', color='r')
+    for interval in distribution[:-1]:
+        ax.plot((interval[0][1], interval[0][1]), (0, 1), linewidth=1, marker='', color='r')
     first_interval = True
     for interval in intervals:
         if first_interval:
@@ -146,7 +153,7 @@ def a_part(dir_path, distribution):
     fig.clf()
 
 
-def c_part(dir_path, distribution):
+def c_part():
     k = 2
     T = 100
     ms = [10 + 5*i for i in range(19)]
@@ -156,9 +163,9 @@ def c_part(dir_path, distribution):
         sum_true_errors = 0
         sum_empirical_errors = 0
         for i in range(T):
-            xs, ys = create_training_set(m, distribution)
+            xs, ys = create_training_set(m)
             intervals, besterror = find_best_interval(xs, ys, k)
-            sum_true_errors += true_error(intervals, distribution)
+            sum_true_errors += true_error(intervals)
             sum_empirical_errors += float(besterror)/m
         true_errors.append(sum_true_errors/T)
         empirical_errors.append(sum_empirical_errors/T)
@@ -174,16 +181,16 @@ def c_part(dir_path, distribution):
     fig.clf()
 
 
-def d_part(dir_path, distribution):
+def d_part():
     m = 50
-    xs, ys = create_training_set(m, distribution)
+    xs, ys = create_training_set(m)
 
     ks = [i for i in range(1, 21)]
     true_errors = []
     empirical_errors = []
     for k in ks:
         intervals, besterror = find_best_interval(xs, ys, k)
-        true_errors.append(true_error(intervals, distribution))
+        true_errors.append(true_error(intervals))
         empirical_errors.append(float(besterror) / m)
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -197,17 +204,17 @@ def d_part(dir_path, distribution):
     fig.clf()
 
 
-def e_part(dir_path, distribution):
+def e_part():
     m = 50
     ks = [i for i in range(1, 21)]
-    xs, ys = create_training_set(m, distribution)
+    xs, ys = create_training_set(m)
     hypothesises = []
     training_scores = []
     for k in ks:
         intervals, besterror = find_best_interval(xs, ys, k)
         hypothesises.append([k, intervals])
         training_scores.append(float(besterror)/m)
-    xs, ys = create_training_set(m, distribution)
+    xs, ys = create_training_set(m)
     best_fitting = empirical_error(xs, ys, hypothesises[0][1])
     best_k = hypothesises[0][0]
     holdout_scores = [best_fitting]
@@ -230,13 +237,6 @@ def e_part(dir_path, distribution):
     print "Holdout validation test found that the smallest error is when k=%d" % best_k
 
 
-dir_path = repr(os.path.dirname(os.path.realpath(sys.argv[0]))).strip("'")
-
-distribution = [((0, 0.25), 0.8),
-                ((0.25, 0.5), 0.1),
-                ((0.5, 0.75), 0.8),
-                ((0.75, 1), 0.1)]
-
 if len(sys.argv) < 2:
     print "Please enter which part do you want to execute - a,c,d,e or all"
     exit()
@@ -247,10 +247,10 @@ for cmd in cmds:
         exit()
 
 if 'a' in cmds or 'all' in cmds:
-    a_part(dir_path, distribution)
+    a_part()
 if 'c' in cmds or 'all' in cmds:
-    c_part(dir_path, distribution)
+    c_part()
 if 'd' in cmds or 'all' in cmds:
-    d_part(dir_path, distribution)
+    d_part()
 if 'e' in cmds or 'all' in cmds:
-    e_part(dir_path, distribution)
+    e_part()
